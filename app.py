@@ -13,7 +13,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 
-# TODO: Получение списка задач
+# Получение списка задач
 @app.route('/tasks/', methods=['GET'])
 def get_tasks():
     tasks = Task.query.all()
@@ -21,7 +21,7 @@ def get_tasks():
     return jsonify(task_schemas), 200
 
 
-# TODO: Получение конкретной задачи
+# Получение конкретной задачи
 @app.route('/tasks/<int:id>/', methods=['GET'])
 def get_task(id: int):
     task = Task.query.filter(Task.id == id).first()
@@ -32,7 +32,7 @@ def get_task(id: int):
         return jsonify({'message': 'Task not found'}), 404
 
 
-# TODO: Создание задачи
+# Создание задачи
 @app.route('/tasks/', methods=['POST'])
 def create_task():
     try:
@@ -47,10 +47,12 @@ def create_task():
         return jsonify(e.errors()), 400
 
 
-# TODO: Обновление задачи
-@app.route('/tasks/<int:id>', methods=['PUT'])
+# Обновление задачи
+@app.route('/tasks/<int:id>/', methods=['PUT'])
 def update_task(id: int):
     task = Task.query.filter(Task.id == id).first()
+    if not task:
+        return jsonify({'message': 'Task not found'}), 404
     try:
         data = request.get_json()
         task_data = TaskUpdateSchema(**data)
@@ -65,7 +67,7 @@ def update_task(id: int):
         return jsonify(e.errors()), 400
 
 
-# TODO: Удаление задачи
+# Удаление задачи
 @app.route('/tasks/<int:id>/', methods=['DELETE'])
 def delete_task(id):
     task = Task.query.filter(Task.id == id).first()
