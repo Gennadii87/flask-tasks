@@ -20,7 +20,7 @@ def get_tasks():
     return jsonify(task_schemas), 200
 
 
-@app.route('/task/<int:id>/', methods=['GET'])
+@app.route('/tasks/<int:id>/', methods=['GET'])
 def get_task(id: int):
     task = Task.query.filter(Task.id == id).first()
     if task:
@@ -44,7 +44,7 @@ def create_task():
         return jsonify(e.errors()), 400
 
 
-@app.route('/task/<int:id>', methods=['PUT'])
+@app.route('/tasks/<int:id>', methods=['PUT'])
 def update_task(id: int):
     task = Task.query.filter(Task.id == id).first()
     try:
@@ -61,7 +61,7 @@ def update_task(id: int):
         return jsonify(e.errors()), 400
 
 
-@app.route('/task/<int:id>/', methods=['DELETE'])
+@app.route('/tasks/<int:id>/', methods=['DELETE'])
 def delete_task(id):
     task = Task.query.filter(Task.id == id).first()
     if task:
@@ -73,4 +73,4 @@ def delete_task(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
