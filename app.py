@@ -1,4 +1,4 @@
-from config import DATABASE_URL
+from config.config import DATABASE_URL
 from flask import Flask
 from flask_migrate import Migrate
 from database.models import db

@@ -1,6 +1,6 @@
 import pytest
 from app import app
-from config import DATABASE_URL
+from config.config import DATABASE_URL
 from database.models import db, Task
 
 
