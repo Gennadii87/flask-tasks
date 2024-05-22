@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 Pydantic
 python-dotenv
 pymysql
+Flask-Migrate
