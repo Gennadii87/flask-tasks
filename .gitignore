@@ -3,3 +3,5 @@ __pycache__/*
 .pytest_cache/*
 venv/
 migrations/*
+database/__pycache__/*
+routers/__pycache__/*
