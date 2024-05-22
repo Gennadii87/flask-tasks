@@ -4,10 +4,9 @@ from config import DATABASE_URL
 from models import db, Task
 
 
-
 @pytest.fixture
 def app():
-    from app import app  # Импортируйте ваше приложение из основного файла
+    from app import app
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     with app.app_context():
