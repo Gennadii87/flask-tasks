@@ -48,9 +48,11 @@ def create_task():
 
 
 # Обновление задачи
-@app.route('/tasks/<int:id>', methods=['PUT'])
+@app.route('/tasks/<int:id>/', methods=['PUT'])
 def update_task(id: int):
     task = Task.query.filter(Task.id == id).first()
+    if not task:
+        return jsonify({'message': 'Task not found'}), 404
     try:
         data = request.get_json()
         task_data = TaskUpdateSchema(**data)
