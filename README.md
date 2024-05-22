@@ -1,7 +1,19 @@
-# flask-_tasks
+# flask-tasks
+<hr/>
+<h2>Мини приложение на Flask</h2> <br/>
 
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
+Перейдите в папку `cd \flask-tasks`<br/>
+Установите необходимы пакеты <pre>`pip install -r requirements.txt`</pre><br/>
+***Внимание необходимо создать в mySQL создать базу данных `todo_db`, тестовое подключение указано в .env*** <br/>
 
-flask run --debug
+Запуск приложения <pre>`python app.py`</pre> <br/>
+Если подключение к базе данных произошло успешно, то приложение запустится и будет доступно по `http://127.0.0.1:4000`<br/> 
+
+Таблицы создадутся сами, но можно также выполнить создание и применение миграций в ручную: <br/>
+<pre>`flask db init`</pre> <br/>
+<pre>`flask db migrate -m "Initial migration"`</pre> <br/>
+<pre>`flask db upgrade`</pre> <br/>
+
+<h2>ТЕСТИРОВАНИЕ</h2> <br/>
+***Внимание запуск тестирования предварительно удалить данные из базы***
+Находясь в папке `flask-tasks` запустите команду <pre>`pytest`</pre><br/>
