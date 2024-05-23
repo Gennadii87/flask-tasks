@@ -8,7 +8,8 @@ from database.service import get_task_list, get_task_id, create_task_db, update_
 api = Api(
     title='Task API',
     version='1.0',
-    description='A simple Task API'
+    description='A simple Task API',
+    doc='/swagger/',
 )
 
 
@@ -82,6 +83,7 @@ class Task(Resource):
         else:
             return {'message': 'Task not found'}, 404
 
+    @router_api.param(name='id', description='Task ID', type='integer', _in='path')
     @router_api.doc(description="Update a specific task by ID", order=4)
     @router_api.expect(task_update_model)
     @router_api.response(200, 'Task update', task_model)
