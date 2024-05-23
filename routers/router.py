@@ -1,7 +1,5 @@
 from flask import request, make_response
 from flask_restx import Resource, Namespace, fields, Api
-
-from flask_restx import abort
 from database.schemas import TaskCreateSchema, TaskUpdateSchema, TaskSchema, TaskDeleteSchema
 from pydantic import ValidationError
 from database.service import get_task_list, get_task_id, create_task_db, update_task_db, delete_task_db
