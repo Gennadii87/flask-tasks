@@ -14,6 +14,16 @@ class TaskSchema(BaseModel):
     class Config:
         from_attributes = True
 
+    def to_dict(self):
+        task_dict = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+        return task_dict
+
 
 class TaskCreateSchema(BaseModel):
     title: constr(min_length=1)
