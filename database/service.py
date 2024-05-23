@@ -1,9 +1,12 @@
 from database.models import Task, db
 
 
-def get_task_list():
-    """Get all tasks"""
-    tasks = Task.query.all()
+def get_task_list(data=None):
+    """Get tasks filtered by title if provided"""
+    if data:
+        tasks = Task.query.filter_by(title=data).all()
+    else:
+        tasks = Task.query.all()
     return tasks
 
 

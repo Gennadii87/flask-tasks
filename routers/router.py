@@ -1,5 +1,7 @@
 from flask import request, make_response
 from flask_restx import Resource, Namespace, fields, Api
+
+from flask_restx import abort
 from database.schemas import TaskCreateSchema, TaskUpdateSchema, TaskSchema, TaskDeleteSchema
 from pydantic import ValidationError
 from database.service import get_task_list, get_task_id, create_task_db, update_task_db, delete_task_db
@@ -41,11 +43,12 @@ task_delete_model = api.model('TaskDeleteSchema', {
 
 @router_api.route('/')
 class Tasks(Resource):
-    @router_api.doc(description="Get list task", order=1)
+    @router_api.doc(description="Get list task", params={'title': 'The task title'}, order=1)
     @router_api.response(200, 'Task list', task_model)
     def get(self):
         """Получение списка задач"""
-        tasks = get_task_list()
+        title_filter = request.args.get('title')
+        tasks = get_task_list(title_filter)
         task_schemas = [TaskSchema.from_orm(task).to_dict() for task in tasks]
         response = make_response(task_schemas)
         response.status_code = 200
@@ -83,8 +86,7 @@ class Task(Resource):
         else:
             return {'message': 'Task not found'}, 404
 
-    @router_api.param(name='id', description='Task ID', type='integer', _in='path')
-    @router_api.doc(description="Update a specific task by ID", order=4)
+    @router_api.doc(description="Update a specific task by ID", order=4, params={'id': 'Task ID'})
     @router_api.expect(task_update_model)
     @router_api.response(200, 'Task update', task_model)
     def put(self, id):
