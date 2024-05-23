@@ -25,5 +25,7 @@ class TaskUpdateSchema(BaseModel):
     description: Optional[str] = None
 
 
+class TaskDeleteSchema(BaseModel):
+    message: Optional[str] = 'Task deleted successfully'
 
 
