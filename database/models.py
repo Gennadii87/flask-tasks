@@ -1,5 +1,7 @@
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+
 
 db = SQLAlchemy()
 
@@ -10,3 +12,5 @@ class Task(db.Model):
     description = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
