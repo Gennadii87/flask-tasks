@@ -1,22 +1,19 @@
-from config.config import DATABASE_URL
-from flask import Flask
 from flask_migrate import Migrate
+from config.config import ConfigApp
+from database.database import BaseWork
 from database.models import db
 from routers.router import router_api, api
 
-app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db.init_app(app)
+app_config = ConfigApp(BaseWork, db)
+app = app_config.get_app()
 migrate = Migrate(app, db)
-
 
 # если убрать, создавать и применять миграции в ручную,
 # flask db init, flask db migrate -m "Initial migration",  flask db upgrade
 with app.app_context():
     db.create_all()
+
 
 api.init_app(app)
 api.add_namespace(router_api)

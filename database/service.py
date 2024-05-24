@@ -1,5 +1,4 @@
 from database.models import Task, db
-from sqlalchemy import or_
 
 
 def get_task_list(title_filter=None, description_filter=None):
