@@ -41,12 +41,17 @@ task_delete_model = api.model('TaskDeleteSchema', {
 
 @router_api.route('/')
 class Tasks(Resource):
-    @router_api.doc(description="Get list task", params={'title': 'The task title'}, order=1)
+    @router_api.doc(
+        description="Get list task",
+        params={'title': 'The task title', 'description': 'The task description'},
+        order=1
+    )
     @router_api.response(200, 'Task list', task_model)
     def get(self):
         """Получение списка задач"""
         title_filter = request.args.get('title')
-        tasks = get_task_list(title_filter)
+        description_filter = request.args.get('description')
+        tasks = get_task_list(title_filter, description_filter)
         task_schemas = [TaskSchema.from_orm(task).to_dict() for task in tasks]
         response = make_response(task_schemas)
         response.status_code = 200
