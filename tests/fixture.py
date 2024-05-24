@@ -1,22 +1,25 @@
 import pytest
-from app import app
-from config.config import DATABASE_URL
 from database.models import db, Task
+from config.config import ConfigApp
+from database.database import BaseTest
+from routers.router import router_api, api
+
+app = ConfigApp(BaseTest, db).get_app()
+api.init_app(app)
+api.add_namespace(router_api)
 
 
 @pytest.fixture
 def app_test():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     with app.app_context():
         db.drop_all()
         db.create_all()
-        yield
+        yield app
 
 
 @pytest.fixture
 def client(app_test):
-    return app.test_client()
+    return app_test.test_client()
 
 
 @pytest.fixture
