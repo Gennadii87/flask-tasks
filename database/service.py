@@ -1,13 +1,18 @@
 from database.models import Task, db
+from sqlalchemy import or_
 
 
-def get_task_list(data=None):
-    """Get tasks filtered by title if provided"""
-    if data:
-        tasks = Task.query.filter_by(title=data).all()
-    else:
-        tasks = Task.query.all()
-    return tasks
+def get_task_list(title_filter=None, description_filter=None):
+    """Get tasks list"""
+    tasks = Task.query
+
+    if title_filter:
+        tasks = tasks.filter(Task.title.like(f"%{title_filter}%"))
+
+    if description_filter:
+        tasks = tasks.filter(Task.description.like(f"%{description_filter}%"))
+
+    return tasks.all()
 
 
 def get_task_id(id):

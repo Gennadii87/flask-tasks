@@ -17,20 +17,20 @@ router_api = Namespace('tasks', description='Operations related to tasks')
 
 task_model = api.model('TaskSchema', {
     'id': fields.Integer(readOnly=True, description='The task unique identifier'),
-    'title': fields.String(readOnly=True, description='The task title'),
-    'description': fields.String(readOnly=True, description='The task description'),
+    'title': fields.String(readOnly=True, description='The task title', pattern='Task'),
+    'description': fields.String(readOnly=True, description='The task description', pattern='Description'),
     'created_at': fields.DateTime(description='The task creation time'),
     'updated_at': fields.DateTime(description='The task update time')
 })
 
 task_create_model = api.model('TaskCreateSchema', {
-    'title': fields.String(required=True, description='The task title'),
-    'description': fields.String(required=False, description='The task description'),
+    'title': fields.String(required=True, description='The task title', pattern='New Task'),
+    'description': fields.String(required=False, description='The task description', pattern='New Description'),
 })
 
 task_update_model = api.model('TaskUpdateSchema', {
-    'title': fields.String(required=False, description='The task title'),
-    'description': fields.String(required=False, description='The task description')
+    'title': fields.String(required=False, description='The task title', pattern='Update Task'),
+    'description': fields.String(required=False, description='The task description', pattern='Update Description')
 
 })
 
@@ -41,12 +41,17 @@ task_delete_model = api.model('TaskDeleteSchema', {
 
 @router_api.route('/')
 class Tasks(Resource):
-    @router_api.doc(description="Get list task", params={'title': 'The task title'}, order=1)
+    @router_api.doc(
+        description="Get list task",
+        params={'title': 'The task title', 'description': 'The task description'},
+        order=1
+    )
     @router_api.response(200, 'Task list', task_model)
     def get(self):
         """Получение списка задач"""
         title_filter = request.args.get('title')
-        tasks = get_task_list(title_filter)
+        description_filter = request.args.get('description')
+        tasks = get_task_list(title_filter, description_filter)
         task_schemas = [TaskSchema.from_orm(task).to_dict() for task in tasks]
         response = make_response(task_schemas)
         response.status_code = 200
@@ -54,7 +59,7 @@ class Tasks(Resource):
 
     @router_api.doc(description="Create a new task", order=3)
     @router_api.expect(task_create_model)
-    @router_api.response(204, 'Task add', task_model)
+    @router_api.response(201, 'Task add', task_model)
     def post(self):
         """Создание новой задачи"""
         try:
@@ -73,9 +78,9 @@ class Tasks(Resource):
 class Task(Resource):
     @router_api.doc(description="Get task by ID", order=2)
     @router_api.response(200, 'Task to id', task_model)
-    def get(self, id):
+    def get(self, *args, **kwargs):
         """Получение конкретной задачи"""
-        task = get_task_id(id)
+        task = get_task_id(*args, **kwargs)
         if task:
             task_schema = TaskSchema.from_orm(task).to_dict()
             response = make_response(task_schema)
@@ -87,9 +92,9 @@ class Task(Resource):
     @router_api.doc(description="Update a specific task by ID", order=4, params={'id': 'Task ID'})
     @router_api.expect(task_update_model)
     @router_api.response(200, 'Task update', task_model)
-    def put(self, id):
+    def put(self, *args, **kwargs):
         """Обновление задачи"""
-        task = get_task_id(id)
+        task = get_task_id(*args, **kwargs)
         if not task:
             return {'message': 'Task not found'}, 404
 
@@ -106,11 +111,11 @@ class Task(Resource):
 
     @router_api.doc(description="Delete task by ID", order=5)
     @router_api.response(204, 'Task deleted', task_delete_model)
-    def delete(self, id):
+    def delete(self, *args, **kwargs):
         """Удаление задачи"""
-        task = get_task_id(id)
+        task = get_task_id(*args, **kwargs)
         if task:
-            delete_task_db(task)
-            return {'message': 'Task deleted successfully'}, 200
+            task_name = delete_task_db(task)
+            return {'message': f'Task `{task_name.title}` deleted successfully'}, 200
         else:
             return {'message': 'Task not found'}, 404
