@@ -1,42 +1,22 @@
+import routers.schemas_api as sch
 from flask import request, make_response
-from flask_restx import Resource, Namespace, fields, Api
+from flask_restx import Resource, Namespace
+
 from database.schemas import TaskCreateSchema, TaskUpdateSchema, TaskSchema, TaskDeleteSchema
-from pydantic import ValidationError
 from database.service import get_task_list, get_task_id, create_task_db, update_task_db, delete_task_db
+from pydantic import ValidationError
 
-
-api = Api(
-    title='Task API',
-    version='1.0',
-    description='A simple Task API',
-    doc='/swagger/',
-)
-
+api = sch.api
 
 router_api = Namespace('tasks', description='Operations related to tasks')
 
-task_model = api.model('TaskSchema', {
-    'id': fields.Integer(readOnly=True, description='The task unique identifier'),
-    'title': fields.String(readOnly=True, description='The task title', pattern='Task'),
-    'description': fields.String(readOnly=True, description='The task description', pattern='Description'),
-    'created_at': fields.DateTime(description='The task creation time'),
-    'updated_at': fields.DateTime(description='The task update time')
-})
+task_model = api.model('TaskSchema', sch.TaskSchemaRestx)
 
-task_create_model = api.model('TaskCreateSchema', {
-    'title': fields.String(required=True, description='The task title', pattern='New Task'),
-    'description': fields.String(required=False, description='The task description', pattern='New Description'),
-})
+task_create_model = api.model('TaskCreate', sch.TaskCreateSchemaRestx)
 
-task_update_model = api.model('TaskUpdateSchema', {
-    'title': fields.String(required=False, description='The task title', pattern='Update Task'),
-    'description': fields.String(required=False, description='The task description', pattern='Update Description')
+task_update_model = api.model('TaskUpdate', sch.TaskUpdateSchemaRestx)
 
-})
-
-task_delete_model = api.model('TaskDeleteSchema', {
-    'message': fields.String(readOnly=True, description='Task deleted successfully'),
-})
+task_delete_model = api.model('TaskDelete', sch.TaskDelete)
 
 
 @router_api.route('/')
@@ -115,7 +95,8 @@ class Task(Resource):
         """Удаление задачи"""
         task = get_task_id(*args, **kwargs)
         if task:
+            task_data = TaskDeleteSchema.to_dict(task)
             task_name = delete_task_db(task)
-            return {'message': f'Task `{task_name.title}` deleted successfully'}, 200
+            return {'message': f'Task `{task_name.title}` deleted successfully', "task": task_data}, 200
         else:
             return {'message': 'Task not found'}, 404
