@@ -37,3 +37,11 @@ class TaskUpdateSchema(BaseModel):
 
 class TaskDeleteSchema(BaseModel):
     message: Optional[str] = 'Task deleted successfully'
+
+    def to_dict(self):
+        task_dict = {
+            'id': self.id,
+            'title': self.title,
+            'delete_at': datetime.utcnow().isoformat()
+        }
+        return task_dict
