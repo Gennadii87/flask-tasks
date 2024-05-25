@@ -7,5 +7,5 @@ database/__pycache__/*
 routers/__pycache__/*
 tests/__pycache__/*
 config/__pycache__/*
-instance/
+instance/*
 log_sql.txt
