@@ -1,20 +1,23 @@
 import pytest
 from database.models import db, Task
-from config.config import ConfigApp
+from config.config import ConfigApp, LoggerConfig
 from database.database import BaseTest
 from routers.router import router_api, api
 
 app = ConfigApp(BaseTest, db).get_app()
 api.init_app(app)
 api.add_namespace(router_api)
+log_config = LoggerConfig('INFO')
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def app_test():
     with app.app_context():
         db.drop_all()
         db.create_all()
         yield app
+        db.session.remove()
+        db.drop_all()
 
 
 @pytest.fixture
@@ -29,6 +32,3 @@ def init_database():
     db.session.add(task1)
     db.session.add(task2)
     db.session.commit()
-    yield db
-    db.session.rollback()
-    db.drop_all()

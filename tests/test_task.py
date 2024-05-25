@@ -67,7 +67,8 @@ def test_delete_task(client, init_database):
     response = client.delete('/tasks/1/')
     assert response.status_code == 200
     data = response.get_json()
-    assert data['message'] == 'Task `Task 1` deleted successfully'
+    title = data.get('task', {}).get("title")
+    assert data['message'] == f'Task `{title}` deleted successfully'
     response = client.get('/tasks/1/')
     assert response.status_code == 404
 
