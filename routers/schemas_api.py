@@ -10,20 +10,20 @@ api = Api(
 
 TaskSchemaRestx = {
     'id': fields.Integer(readOnly=True, description='The task unique identifier'),
-    'title': fields.String(readOnly=True, description='The task title', pattern='Task'),
-    'description': fields.String(readOnly=True, description='The task description', pattern='Description'),
+    'title': fields.String(readOnly=True, description='The task title', default='Task'),
+    'description': fields.String(readOnly=True, description='The task description', default='Description'),
     'created_at': fields.DateTime(description='The task creation time'),
     'updated_at': fields.DateTime(description='The task update time')
 }
 
 TaskCreateSchemaRestx = {
-    'title': fields.String(required=True, description='The task title', pattern='New Task'),
-    'description': fields.String(required=False, description='The task description', pattern='New Description'),
+    'title': fields.String(required=True, description='The task title', default='New Task'),
+    'description': fields.String(required=False, description='The task description', default='New Description'),
 }
 
 TaskUpdateSchemaRestx = {
-    'title': fields.String(required=False, description='The task title', pattern='Update Task'),
-    'description': fields.String(required=False, description='The task description', pattern='Update Description')
+    'title': fields.String(required=False, description='The task title', default='Update Task'),
+    'description': fields.String(required=False, description='The task description', default='Update Description')
 
 }
 
