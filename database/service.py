@@ -1,22 +1,26 @@
 from database.models import Task, db
+from sqlalchemy import select
 
 
 def get_task_list(title_filter=None, description_filter=None):
     """Get tasks list"""
-    tasks = Task.query
+
+    stmt = select(Task).order_by(Task.id)
 
     if title_filter:
-        tasks = tasks.filter(Task.title.like(f"%{title_filter}%"))
+        stmt = stmt.where(Task.title.like(f"%{title_filter}%"))
 
     if description_filter:
-        tasks = tasks.filter(Task.description.like(f"%{description_filter}%"))
+        stmt = stmt.where(Task.description.like(f"%{description_filter}%"))
 
-    return tasks.all()
+    tasks = db.session.execute(stmt).scalars().all()
+
+    return tasks
 
 
 def get_task_id(id):
     """Get task to id"""
-    task = Task.query.filter(Task.id == id).first()
+    task = db.session.execute(db.select(Task).filter_by(id=id)).scalar_one_or_none()
     return task
 
 

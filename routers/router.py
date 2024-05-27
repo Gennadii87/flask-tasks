@@ -24,7 +24,6 @@ class Tasks(Resource):
     @router_api.doc(
         description="Get list task",
         params={'title': 'The task title', 'description': 'The task description'},
-        order=1
     )
     @router_api.response(200, 'Task list', task_model)
     def get(self):
@@ -37,7 +36,7 @@ class Tasks(Resource):
         response.status_code = 200
         return response
 
-    @router_api.doc(description="Create a new task", order=3)
+    @router_api.doc(description="Create a new task")
     @router_api.expect(task_create_model)
     @router_api.response(201, 'Task add', task_model)
     def post(self):
@@ -56,7 +55,7 @@ class Tasks(Resource):
 
 @router_api.route('/<int:id>/')
 class Task(Resource):
-    @router_api.doc(description="Get task by ID", order=2)
+    @router_api.doc(description="Get task by ID")
     @router_api.response(200, 'Task to id', task_model)
     def get(self, *args, **kwargs):
         """Получение конкретной задачи"""
@@ -69,7 +68,7 @@ class Task(Resource):
         else:
             return {'message': 'Task not found'}, 404
 
-    @router_api.doc(description="Update a specific task by ID", order=4, params={'id': 'Task ID'})
+    @router_api.doc(description="Update a specific task by ID", params={'id': 'Task ID'})
     @router_api.expect(task_update_model)
     @router_api.response(200, 'Task update', task_model)
     def put(self, *args, **kwargs):
@@ -89,7 +88,7 @@ class Task(Resource):
         except ValidationError as e:
             return e.errors(), 400
 
-    @router_api.doc(description="Delete task by ID", order=5)
+    @router_api.doc(description="Delete task by ID")
     @router_api.response(204, 'Task deleted', task_delete_model)
     def delete(self, *args, **kwargs):
         """Удаление задачи"""
