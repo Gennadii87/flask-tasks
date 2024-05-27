@@ -8,7 +8,9 @@ from pydantic import ValidationError
 
 api = sch.api
 
-router_api = Namespace('tasks', description='Operations related to tasks')
+router_api = Namespace(name='tasks', description='Operations related to tasks')
+
+api.add_namespace(router_api, path='/api/v1/tasks')
 
 task_model = api.model('TaskSchema', sch.TaskSchemaRestx)
 

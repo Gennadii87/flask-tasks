@@ -1,11 +1,24 @@
 from flask_restx import fields
 from flask_restx import Api
 
+authorizations = {
+    "Basic": {
+        "type": "basic",
+        "flow": "password",
+    },
+    "Bearer": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+    },
+}
+
 api = Api(
     title='Task API',
     version='1.0',
     description='A simple Task API',
     doc='/swagger/',
+    authorizations=authorizations
 )
 
 TaskSchemaRestx = {
