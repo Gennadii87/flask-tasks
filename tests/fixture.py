@@ -9,7 +9,8 @@ api.init_app(app)
 log_config = LoggerConfig('INFO')
 
 
-@pytest.fixture(scope='session')
+# @pytest.fixture(scope='session') # если надо в одной сессии запускать
+@pytest.fixture
 def app_test():
     with app.app_context():
         db.drop_all()
@@ -31,3 +32,4 @@ def init_database():
     db.session.add(task1)
     db.session.add(task2)
     db.session.commit()
+
