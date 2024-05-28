@@ -10,3 +10,4 @@ config/__pycache__/*
 instance/*
 log_sql.txt
 test.db
+response.json
