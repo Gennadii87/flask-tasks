@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from config.config import ConfigApp, LoggerConfig
 from database.database import BaseWork
 from database.models import db
-from routers.router import router_api, api
+from routers.router import router_api, api, router_api_test
 
 app_config = ConfigApp(BaseWork, db)
 app = app_config.get_app()
@@ -29,6 +29,7 @@ with app.app_context():
 
 api.init_app(app)
 api.add_namespace(router_api)
+api.add_namespace(router_api_test)
 
 if __name__ == '__main__':
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
