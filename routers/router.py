@@ -1,5 +1,6 @@
 import subprocess
 import re
+import json
 
 import routers.schemas_api as sch
 from flask import request, make_response, jsonify
@@ -138,7 +139,7 @@ class RunTests(Resource):
                     match = line.split()
                     test_name = match[1]
                     test_result = 'FAILED'
-                    info = ' '.join(match[3:8])
+                    info = f"ERROR: {' '.join(match[3:8])}"
                     passed_tests += 1
                     test_progress = f"{min((passed_tests / total_tests) * 100, 100):.0f}%"
                     test_results.append({
@@ -157,7 +158,7 @@ class RunTests(Resource):
                     'test': test_name.split("::")[-1],
                     'result': test_result,
                     'progress': test_progress,
-                    'info': 'Ок!'
+                    'info': 'OK'
                 })
 
         summary = output_lines[-1] if output_lines else "No tests found"
@@ -170,5 +171,8 @@ class RunTests(Resource):
 
         if failed_tests_count > 0:
             response['FAILED'] = f"{failed_tests_count} TEST"
+
+        with open("response.json", "w", encoding="utf-8") as file:
+            json.dump(response, file, indent=4, ensure_ascii=False)
 
         return jsonify(response)
