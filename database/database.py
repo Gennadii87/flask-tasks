@@ -9,11 +9,11 @@ class Base(DeclarativeBase):
 class DataBaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'echo_pool': True,
+        'echo_pool': False,
         'pool_pre_ping': True
     }
     SQLALCHEMY_ECHO = False
-    DEBUG = True
+    DEBUG = False
 
 
 class BaseWork(DataBaseConfig):

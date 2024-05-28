@@ -114,16 +114,27 @@ class RunTests(Resource):
     @api.doc(description="Run tests and return the results",
              params={'test_name': 'example `test_get_tasks`'}
              )
+    @api.param(name='count', type='int', description='count test (integer)')
     def get(self):
         """Запуск тестов и получение результатов"""
         test_name = request.args.get('test_name')
+        count = request.args.get('count', 1, type=int)
         test_results = []
+
         if test_name:
-            pytest_command = ['pytest', f'tests/test_task.py::{test_name}', '--maxfail=10', '--disable-warnings', '-q']
+            pytest_command = ['pytest',
+                              f'tests/test_task.py::{test_name}',
+                              '--maxfail=10',
+                              '-q',
+                              f'--count={count}'
+                              ]
             total_tests = 1
             passed_tests = 0
         else:
-            pytest_command = ['pytest', '--maxfail=10', '--disable-warnings', '-q']
+            pytest_command = ['pytest',
+                              '--maxfail=10',
+                              '-q', f'--count={count}'
+                              ]
             total_tests = 9
             passed_tests = 0
 
