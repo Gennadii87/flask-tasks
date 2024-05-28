@@ -10,11 +10,12 @@ from database.service import get_task_list, get_task_id, create_task_db, update_
 from pydantic import ValidationError
 
 api = sch.api
+url_prefix = '/api/v1/tasks'
 
 router_api = Namespace(name='tasks', description='Operations related to tasks')
 router_api_test = Namespace(name='tasks-test', description='Test api')
 
-api.add_namespace(router_api, path='/api/v1/tasks')
+api.add_namespace(router_api, path=url_prefix)
 
 task_model = api.model('TaskSchema', sch.TaskSchemaRestx)
 
