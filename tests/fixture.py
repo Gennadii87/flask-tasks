@@ -2,11 +2,10 @@ import pytest
 from database.models import db, Task
 from config.config import ConfigApp, LoggerConfig
 from database.database import BaseTest
-from routers.router import router_api, api
+from routers.router import api
 
 app = ConfigApp(BaseTest, db).get_app()
 api.init_app(app)
-api.add_namespace(router_api)
 log_config = LoggerConfig('INFO')
 
 

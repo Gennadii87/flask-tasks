@@ -1,5 +1,9 @@
+import subprocess
+import re
+import json
+
 import routers.schemas_api as sch
-from flask import request, make_response
+from flask import request, make_response, jsonify
 from flask_restx import Resource, Namespace
 
 from database.schemas import TaskCreateSchema, TaskUpdateSchema, TaskSchema, TaskDeleteSchema
@@ -7,10 +11,12 @@ from database.service import get_task_list, get_task_id, create_task_db, update_
 from pydantic import ValidationError
 
 api = sch.api
+url_prefix = '/api/v1/tasks'
 
 router_api = Namespace(name='tasks', description='Operations related to tasks')
+router_api_test = Namespace(name='tasks-test', description='Test api')
 
-api.add_namespace(router_api, path='/api/v1/tasks')
+api.add_namespace(router_api, path=url_prefix)
 
 task_model = api.model('TaskSchema', sch.TaskSchemaRestx)
 
@@ -101,3 +107,72 @@ class Task(Resource):
             return {'message': f'Task `{task_name.title}` deleted successfully', "task": task_data}, 200
         else:
             return {'message': 'Task not found'}, 404
+
+
+@router_api_test.route('/')
+class RunTests(Resource):
+    @api.doc(description="Run tests and return the results",
+             params={'test_name': 'example `test_get_tasks`'}
+             )
+    def get(self):
+        """Запуск тестов и получение результатов"""
+        test_name = request.args.get('test_name')
+        test_results = []
+        if test_name:
+            pytest_command = ['pytest', f'tests/test_task.py::{test_name}', '--maxfail=10', '--disable-warnings', '-q']
+            total_tests = 1
+            passed_tests = 0
+        else:
+            pytest_command = ['pytest', '--maxfail=10', '--disable-warnings', '-q']
+            total_tests = 9
+            passed_tests = 0
+
+        result = subprocess.run(pytest_command, capture_output=True, text=True)
+        output_lines = result.stdout.strip().split('\n')
+
+        error_info_pattern = re.compile(r"FAILED\s(.*?)\s-\sassert\s(.*)\s==\s(.*)$")
+
+        for line in output_lines:
+            if 'FAILED' in line:
+                match = error_info_pattern.search(line)
+                if match:
+                    match = line.split()
+                    test_name = match[1]
+                    test_result = 'FAILED'
+                    info = f"ERROR: {' '.join(match[3:8])}"
+                    passed_tests += 1
+                    test_progress = f"{min((passed_tests / total_tests) * 100, 100):.0f}%"
+                    test_results.append({
+                        'test': test_name.split("::")[-1],
+                        'result': test_result,
+                        'progress': test_progress,
+                        'info': info
+                    })
+            elif 'PASSED' in line:
+                parts = line.split()
+                test_name = parts[0]
+                test_result = 'PASSED'
+                passed_tests += 1
+                test_progress = f"{min((passed_tests / total_tests) * 100, 100):.0f}%"
+                test_results.append({
+                    'test': test_name.split("::")[-1],
+                    'result': test_result,
+                    'progress': test_progress,
+                    'info': 'OK'
+                })
+
+        summary = output_lines[-1] if output_lines else "No tests found"
+        failed_tests_count = sum(1 for result in test_results if result['result'] == 'FAILED')
+
+        response = {
+            'test_results': test_results,
+            'summary': summary,
+        }
+
+        if failed_tests_count > 0:
+            response['FAILED'] = f"{failed_tests_count} TEST"
+
+        with open("response.json", "w", encoding="utf-8") as file:
+            json.dump(response, file, indent=4, ensure_ascii=False)
+
+        return jsonify(response)
