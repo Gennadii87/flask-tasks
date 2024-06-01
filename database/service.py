@@ -48,3 +48,11 @@ def delete_task_db(task):
         db.session.delete(task)
         db.session.commit()
         return task
+
+
+def delete_task_all(all_task):
+    """Delete all tasks"""
+    if all_task == 'all':
+        db.session.execute(db.delete(Task))
+        db.session.commit()
+        return Task

@@ -7,8 +7,10 @@ from flask import request, make_response, jsonify
 from flask_restx import Resource, Namespace
 
 from database.schemas import TaskCreateSchema, TaskUpdateSchema, TaskSchema, TaskDeleteSchema
-from database.service import get_task_list, get_task_id, create_task_db, update_task_db, delete_task_db
+from database.service import get_task_list, get_task_id, create_task_db, update_task_db, delete_task_db, delete_task_all
+from database.database import BaseTest
 from pydantic import ValidationError
+
 
 api = sch.api
 url_prefix = '/api/v1/tasks'
@@ -59,6 +61,20 @@ class Tasks(Resource):
             return response
         except ValidationError as e:
             return e.errors(), 400
+
+    @router_api.doc(description="Delete all task")
+    @api.param(name='all', type='str', description='all delete task')
+    @router_api.response(204, 'Task deleted all')
+    def delete(self, *args):
+        """Удаление всех задач"""
+        tasks_all = request.args.get('all')
+        if tasks_all == 'all':
+            response = delete_task_all(tasks_all)
+            return {'message': f'Tasks `{tasks_all} - {response}` deleted successfully'}, 200
+        elif tasks_all is None:
+            return {'message': 'Parameter cannot be empty'}, 400
+        else:
+            return {'message': f'Invalid request parameter `{tasks_all}`'}, 400
 
 
 @router_api.route('/<int:id>/')
@@ -111,6 +127,8 @@ class Task(Resource):
 
 @router_api_test.route('/')
 class RunTests(Resource):
+    database_name = BaseTest.SQLALCHEMY_DATABASE_URI.get('sql_1')
+
     @api.doc(description="Run tests and return the results",
              params={'test_name': 'example `test_get_tasks`'}
              )
@@ -178,6 +196,7 @@ class RunTests(Resource):
         response = {
             'test_results': test_results,
             'summary': summary,
+            'database_name': self.database_name
         }
 
         if failed_tests_count > 0:
